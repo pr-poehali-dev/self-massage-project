@@ -4,12 +4,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [difficultyFilter, setDifficultyFilter] = useState<string>('all');
   const [bodyPartFilter, setBodyPartFilter] = useState<string>('all');
+  const [selectedTechnique, setSelectedTechnique] = useState<typeof techniques[0] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openTechniqueModal = (technique: typeof techniques[0]) => {
+    setSelectedTechnique(technique);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedTechnique(null), 300);
+  };
 
   const scrollToSection = (sectionId: string) => {
     setActiveSection(sectionId);
@@ -368,10 +381,10 @@ const Index = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredTechniques.map((technique, index) => (
-              <Card key={technique.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 animate-scale-in border-2 hover:border-primary/50" style={{ animationDelay: `${index * 100}ms` }}>
+              <Card key={technique.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 animate-scale-in border-2 hover:border-primary/50 cursor-pointer" style={{ animationDelay: `${index * 100}ms` }} onClick={() => openTechniqueModal(technique)}>
                 <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5">
                   <img src={technique.videoUrl} alt={technique.title} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                     <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
                       <Icon name="Play" size={32} className="text-primary ml-1" />
                     </div>
@@ -395,7 +408,7 @@ const Index = () => {
                   <CardDescription className="text-sm">{technique.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="outline" className="w-full gap-2">
+                  <Button variant="outline" className="w-full gap-2" onClick={(e) => { e.stopPropagation(); openTechniqueModal(technique); }}>
                     <Icon name="PlayCircle" size={18} />
                     Смотреть инструкцию
                   </Button>
@@ -642,6 +655,128 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          {selectedTechnique && (
+            <>
+              <DialogHeader>
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="p-3 rounded-xl bg-primary/10 text-primary">
+                    <Icon name={selectedTechnique.icon} size={32} />
+                  </div>
+                  <div className="flex-1">
+                    <DialogTitle className="text-2xl mb-2">{selectedTechnique.title}</DialogTitle>
+                    <DialogDescription className="text-base">
+                      {selectedTechnique.description}
+                    </DialogDescription>
+                    <div className="flex gap-3 mt-3">
+                      <span className="inline-flex items-center gap-1 text-sm px-3 py-1 rounded-full bg-secondary/10 text-secondary font-medium">
+                        <Icon name="Clock" size={14} />
+                        {selectedTechnique.duration}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-sm px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">
+                        <Icon name="Target" size={14} />
+                        {selectedTechnique.difficulty}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-sm px-3 py-1 rounded-full bg-orange-100 text-orange-600 font-medium">
+                        <Icon name="Hand" size={14} />
+                        {selectedTechnique.bodyPart}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </DialogHeader>
+
+              <div className="space-y-6">
+                <div className="relative aspect-video rounded-lg overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-border">
+                  <img 
+                    src={selectedTechnique.videoUrl} 
+                    alt={selectedTechnique.title} 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <button className="w-20 h-20 rounded-full bg-white/95 hover:bg-white transition-all flex items-center justify-center hover:scale-110 duration-200 shadow-2xl">
+                      <Icon name="Play" size={40} className="text-primary ml-2" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-lg p-6 border-2 border-primary/10">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <Icon name="Lightbulb" size={20} className="text-primary" />
+                    Пошаговая инструкция
+                  </h3>
+                  <ol className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">1</div>
+                      <div className="flex-1 pt-1">
+                        <p className="font-medium text-sm">Подготовьте место и руки</p>
+                        <p className="text-sm text-muted-foreground mt-1">Займите удобное положение, вымойте руки, при необходимости нанесите массажное масло</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">2</div>
+                      <div className="flex-1 pt-1">
+                        <p className="font-medium text-sm">Разогрейте область</p>
+                        <p className="text-sm text-muted-foreground mt-1">Начните с легких поглаживающих движений в течение 1-2 минут</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">3</div>
+                      <div className="flex-1 pt-1">
+                        <p className="font-medium text-sm">Основная техника</p>
+                        <p className="text-sm text-muted-foreground mt-1">Выполняйте круговые движения средней интенсивности согласно видео-инструкции</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">4</div>
+                      <div className="flex-1 pt-1">
+                        <p className="font-medium text-sm">Завершение</p>
+                        <p className="text-sm text-muted-foreground mt-1">Закончите легкими поглаживаниями, дайте телу отдохнуть 5-10 минут</p>
+                      </div>
+                    </li>
+                  </ol>
+                </div>
+
+                <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-5">
+                  <div className="flex items-start gap-3">
+                    <Icon name="AlertCircle" size={24} className="text-orange-600 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-semibold text-orange-900 mb-2">Важные рекомендации</h4>
+                      <ul className="space-y-2 text-sm text-orange-800">
+                        <li className="flex items-start gap-2">
+                          <Icon name="Check" size={16} className="mt-0.5 flex-shrink-0" />
+                          <span>Массаж не должен вызывать острую боль — только приятные ощущения</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Icon name="Check" size={16} className="mt-0.5 flex-shrink-0" />
+                          <span>Избегайте массажа при острых воспалениях и повреждениях кожи</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Icon name="Check" size={16} className="mt-0.5 flex-shrink-0" />
+                          <span>После массажа рекомендуется выпить стакан воды</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button className="flex-1 gap-2" size="lg">
+                    <Icon name="Play" size={20} />
+                    Начать массаж
+                  </Button>
+                  <Button variant="outline" className="gap-2" size="lg" onClick={closeModal}>
+                    <Icon name="X" size={20} />
+                    Закрыть
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
