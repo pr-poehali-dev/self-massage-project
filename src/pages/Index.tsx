@@ -8,6 +8,8 @@ import Icon from '@/components/ui/icon';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
+  const [difficultyFilter, setDifficultyFilter] = useState<string>('all');
+  const [bodyPartFilter, setBodyPartFilter] = useState<string>('all');
 
   const scrollToSection = (sectionId: string) => {
     setActiveSection(sectionId);
@@ -22,6 +24,7 @@ const Index = () => {
       description: 'Снятие напряжения и улучшение кровообращения в воротниковой зоне',
       duration: '10 минут',
       difficulty: 'Легко',
+      bodyPart: 'Шея и плечи',
       videoUrl: 'https://cdn.poehali.dev/projects/b61f4f3f-8afb-4b3c-ab7a-de8cea04a666/files/d24c6f2d-7a52-408c-88af-71b9170be4c6.jpg',
       icon: 'User'
     },
@@ -31,6 +34,7 @@ const Index = () => {
       description: 'Улучшение тонуса кожи и снятие усталости',
       duration: '8 минут',
       difficulty: 'Средне',
+      bodyPart: 'Лицо',
       videoUrl: 'https://cdn.poehali.dev/projects/b61f4f3f-8afb-4b3c-ab7a-de8cea04a666/files/3e16609b-ae17-49e5-bfa5-f9f2d0a4f5b1.jpg',
       icon: 'Smile'
     },
@@ -40,6 +44,7 @@ const Index = () => {
       description: 'Рефлексотерапия для общего оздоровления организма',
       duration: '12 минут',
       difficulty: 'Легко',
+      bodyPart: 'Стопы',
       videoUrl: 'https://cdn.poehali.dev/projects/b61f4f3f-8afb-4b3c-ab7a-de8cea04a666/files/6244e123-a408-4939-b1a9-108592d2ed60.jpg',
       icon: 'Footprints'
     },
@@ -49,6 +54,7 @@ const Index = () => {
       description: 'Профилактика туннельного синдрома и улучшение подвижности',
       duration: '7 минут',
       difficulty: 'Легко',
+      bodyPart: 'Руки',
       videoUrl: 'https://cdn.poehali.dev/projects/b61f4f3f-8afb-4b3c-ab7a-de8cea04a666/files/6244e123-a408-4939-b1a9-108592d2ed60.jpg',
       icon: 'Hand'
     },
@@ -58,6 +64,7 @@ const Index = () => {
       description: 'Снятие мышечных зажимов и улучшение осанки',
       duration: '15 минут',
       difficulty: 'Средне',
+      bodyPart: 'Спина',
       videoUrl: 'https://cdn.poehali.dev/projects/b61f4f3f-8afb-4b3c-ab7a-de8cea04a666/files/d24c6f2d-7a52-408c-88af-71b9170be4c6.jpg',
       icon: 'Activity'
     },
@@ -67,10 +74,17 @@ const Index = () => {
       description: 'Снятие головной боли и улучшение сна',
       duration: '10 минут',
       difficulty: 'Легко',
+      bodyPart: 'Голова',
       videoUrl: 'https://cdn.poehali.dev/projects/b61f4f3f-8afb-4b3c-ab7a-de8cea04a666/files/3e16609b-ae17-49e5-bfa5-f9f2d0a4f5b1.jpg',
       icon: 'Brain'
     }
   ];
+
+  const filteredTechniques = techniques.filter(technique => {
+    const matchesDifficulty = difficultyFilter === 'all' || technique.difficulty === difficultyFilter;
+    const matchesBodyPart = bodyPartFilter === 'all' || technique.bodyPart === bodyPartFilter;
+    return matchesDifficulty && matchesBodyPart;
+  });
 
   const benefits = [
     {
@@ -274,7 +288,7 @@ const Index = () => {
 
       <section id="techniques" className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12 animate-fade-in">
+          <div className="text-center mb-8 animate-fade-in">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary rounded-full text-sm font-medium mb-4">
               <Icon name="Play" size={16} />
               Видеоинструкции
@@ -284,8 +298,76 @@ const Index = () => {
               Изучите проверенные техники массажа с подробными видеоинструкциями
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {techniques.map((technique, index) => (
+
+          <div className="flex flex-col md:flex-row gap-4 mb-8 max-w-4xl mx-auto">
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <Icon name="Filter" size={16} className="text-primary" />
+                Фильтр по сложности
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {['all', 'Легко', 'Средне'].map((level) => (
+                  <Button
+                    key={level}
+                    variant={difficultyFilter === level ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setDifficultyFilter(level)}
+                    className="gap-1"
+                  >
+                    <Icon name={level === 'all' ? 'Layers' : level === 'Легко' ? 'Check' : 'Zap'} size={14} />
+                    {level === 'all' ? 'Все' : level}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 flex items-center gap-2">
+                <Icon name="Target" size={16} className="text-secondary" />
+                Фильтр по части тела
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {['all', 'Шея и плечи', 'Лицо', 'Стопы', 'Руки', 'Спина', 'Голова'].map((part) => (
+                  <Button
+                    key={part}
+                    variant={bodyPartFilter === part ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setBodyPartFilter(part)}
+                  >
+                    {part === 'all' ? 'Все' : part}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {filteredTechniques.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+                <Icon name="SearchX" size={32} className="text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Техники не найдены</h3>
+              <p className="text-muted-foreground mb-6">Попробуйте изменить фильтры</p>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setDifficultyFilter('all');
+                  setBodyPartFilter('all');
+                }}
+                className="gap-2"
+              >
+                <Icon name="RotateCcw" size={16} />
+                Сбросить фильтры
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="text-center mb-6">
+                <p className="text-sm text-muted-foreground">
+                  Найдено техник: <span className="font-semibold text-primary">{filteredTechniques.length}</span> из {techniques.length}
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredTechniques.map((technique, index) => (
               <Card key={technique.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 animate-scale-in border-2 hover:border-primary/50" style={{ animationDelay: `${index * 100}ms` }}>
                 <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5">
                   <img src={technique.videoUrl} alt={technique.title} className="w-full h-full object-cover" />
@@ -319,8 +401,10 @@ const Index = () => {
                   </Button>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </section>
 
